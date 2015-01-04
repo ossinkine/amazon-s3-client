@@ -1,0 +1,59 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ selected_bucket }}{% endblock %}
+
+{% block content %}
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{{ path('index') }}">Amazon S3 Client</a>
+            </div>
+            <div class="navbar-right navbar-form">
+                <a href="{{ path('logout') }}" class="btn btn-default">Logout</a>
+            </div>
+            <div class="navbar-right navbar-text">
+                Your Access Key ID is <strong>{{ app.security.token.user }}</strong>
+            </div>
+        </div>
+    </nav>
+
+    {% if errors is not empty %}
+        {% for error in errors %}
+            <div class="alert alert-danger" role="alert">{{ error }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3">
+                <ul class="nav nav-pills nav-stacked">
+                    {% for bucket in buckets %}
+                        <li role="presentation"{% if bucket.Name == selected_bucket %} class="active"{% endif %}>
+                            <a href="{{ path('index', { bucket: bucket.Name }) }}" title="Creation Date: {{ bucket.CreationDate }}">{{ bucket.Name }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-sm-9">
+                {% if selected_bucket is not empty %}
+                    {% if objects is not empty %}
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Key</th>
+                                <th>Size</th>
+                            </tr>
+                            {% for object in objects %}
+                                <tr>
+                                    <td><a href="http://{{ selected_bucket }}.s3.amazonaws.com/{{ object.Key }}" title="ETag: {{ object.ETag|trim('"') }}{{ "\n" }}Last Modified: {{ object.LastModified }}">{{ object.Key }}</a></td>
+                                    <td>{{ object.Size }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">The bucket does not contain any keys</div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

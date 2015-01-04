@@ -1,0 +1,16 @@
+{
+    "autoload": {
+        "psr-0": { "": "src/" }
+    },
+    "require": {
+        "php": "~5.3",
+        "silex/silex": "~1.1",
+        "twig/twig": "~1.8",
+        "symfony/twig-bridge": "~2.3",
+        "symfony/security": "~2.3",
+        "aws/aws-sdk-php": "2.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.*"
+    }
+}
