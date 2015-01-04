@@ -1,6 +1,14 @@
 <?php
 
+use Aws\S3\S3Client;
+use Controller\AmazonS3Controller;
+use Controller\AuthenticationController;
+use Silex\Provider\ServiceControllerServiceProvider;
+use Silex\Provider\TwigServiceProvider;
+use Silex\Provider\UrlGeneratorServiceProvider;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class Application extends Silex\Application
 {
@@ -10,22 +18,24 @@ class Application extends Silex\Application
      */
     public function __construct(array $values = array())
     {
-        $values['amazon_s3_client.service'] = $this->share(function (Application $app) {
-            $token = $app['security']->getToken();
-
-            return Aws\S3\S3Client::factory(array(
-                'key'    => $token->getUsername(),
-                'secret' => $token->getCredentials(),
-            ));
+        $values['amazon_s3_client'] = $this->share(function (Application $app) {
+            return S3Client::factory($app['amazon_s3_credentials']);
         });
+        $values['amazon_s3_credentials'] = $this->share(function (Application $app) {
+            return json_decode($app['request']->cookies->get($app['amazon_s3_credentials_cookie_name']), true);
+        });
+        $values['amazon_s3_credentials_cookie_name'] = 'credentials';
 
-        $values['amazon_s3_client.controller'] = $this->share(function (Application $app) {
-            return new \Controller\AmazonS3Controller($app['twig'], $app['amazon_s3_client.service']);
+        $values['controller.amazon_s3_client'] = $this->share(function (Application $app) {
+            return new AmazonS3Controller($app['twig'], $app['amazon_s3_client']);
+        });
+        $values['controller.authentication'] = $this->share(function (Application $app) {
+            return new AuthenticationController($app['twig'], $app['amazon_s3_credentials_cookie_name']);
         });
 
         parent::__construct($values);
 
-        $this->register(new Silex\Provider\TwigServiceProvider(), array(
+        $this->register(new TwigServiceProvider(), array(
             'twig.path'    => __DIR__.'/../views',
             'twig.options' => array(
                 'debug'            => $this['debug'],
@@ -33,43 +43,40 @@ class Application extends Silex\Application
                 'strict_variables' => true,
             ),
         ));
-        $this->register(new Silex\Provider\UrlGeneratorServiceProvider());
-        $this->register(new Silex\Provider\SessionServiceProvider(), array(
-            'session.storage.save_path' => __DIR__.'/../cache/session',
-        ));
-        $this->register(new Silex\Provider\SecurityServiceProvider(), array(
-            'security.firewalls' => array(
-                'login' => array(
-                    'pattern' => '^/login$',
-                ),
-                'main' => array(
-                    'form'   => true,
-                    'logout' => true,
-                ),
-            ),
-            'security.authentication_manager' => $this->share(function (Application $app) {
-                $manager = new Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager($app['security.authentication_providers'], false);
-                $manager->setEventDispatcher($app['dispatcher']);
-
-                return $manager;
-            }),
-            'security.authentication_provider.main.dao' => $this->share(function () {
-                return new Security\Authentication\Provider\AmazonS3Provider();
-            }),
-        ));
-        $this->register(new Silex\Provider\ServiceControllerServiceProvider());
-
-        $this->get('/login', function (Application $app, Request $request) {
-            return $app['twig']->render('login.html.twig', array(
-                'error'         => $app['security.last_error']($request),
-                'last_username' => $app['session']->get('_security.last_username'),
-            ));
-        });
+        $this->register(new UrlGeneratorServiceProvider());
+        $this->register(new ServiceControllerServiceProvider());
 
         $this
-            ->get('/{bucket}', 'amazon_s3_client.controller:indexAction')
+            ->get('/login', 'controller.authentication:loginAction')
+            ->bind('login')
+            ->before(function (Request $request, Application $app) {
+                if (!empty($app['amazon_s3_credentials'])) {
+                    return new RedirectResponse($app['url_generator']->generate('list'));
+                }
+            })
+        ;
+        $this
+            ->post('/login', 'controller.authentication:authenticateAction')
+            ->bind('authenticate')
+        ;
+        $this
+            ->post('/logout', 'controller.authentication:logoutAction')
+            ->bind('logout')
+        ;
+
+        $this
+            ->get('/{bucket}', 'controller.amazon_s3_client:listAction')
             ->value('bucket', null)
-            ->bind('index')
+            ->bind('list')
+            ->before(function (Request $request, Application $app) {
+                if (empty($app['amazon_s3_credentials'])) {
+                    return $app->handle(
+                        Request::create($app['url_generator']->generate('login')),
+                        HttpKernelInterface::SUB_REQUEST,
+                        false
+                    );
+                }
+            })
         ;
     }
 }

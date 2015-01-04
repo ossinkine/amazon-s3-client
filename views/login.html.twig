@@ -1,15 +1,15 @@
 {% extends 'layout.html.twig' %}
 
 {% block content %}
-    <form class="form-signin" action="{{ path('login_check') }}" method="post">
-        {% if error %}
+    <form class="form-signin" action="{{ path('authenticate') }}" method="post">
+        {% if error is not empty %}
             <div class="alert alert-danger" role="alert">{{ error }}</div>
         {% endif %}
         <h2 class="form-signin-heading">Enter your credentials</h2>
-        <label for="input-username" class="sr-only">Access Key ID</label>
-        <input type="text" name="_username" id="input-username" class="form-control" placeholder="Access Key ID" value="{{ last_username }}" autocomplete="off" required autofocus>
-        <label for="inputPassword" class="sr-only">Secret Access Key</label>
-        <input type="password" name="_password" id="input-password" class="form-control" placeholder="Secret Access Key" required>
+        <label for="input-key" class="sr-only">Access Key ID</label>
+        <input type="text" name="key" id="input-key" class="form-control" placeholder="Access Key ID" autocomplete="off" required autofocus>
+        <label for="input-secret" class="sr-only">Secret Access Key</label>
+        <input type="password" name="secret" id="input-secret" class="form-control" placeholder="Secret Access Key" required>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
     </form>
 {% endblock %}

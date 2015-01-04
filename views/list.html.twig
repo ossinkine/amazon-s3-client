@@ -6,13 +6,13 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="{{ path('index') }}">Amazon S3 Client</a>
+                <a class="navbar-brand" href="{{ path('list') }}">Amazon S3 Client</a>
             </div>
-            <div class="navbar-right navbar-form">
-                <a href="{{ path('logout') }}" class="btn btn-default">Logout</a>
-            </div>
+            <form action="{{ path('logout') }}" method="post" class="navbar-right navbar-form">
+                <button type="submit" class="btn btn-default">Logout</button>
+            </form>
             <div class="navbar-right navbar-text">
-                Your Access Key ID is <strong>{{ app.security.token.user }}</strong>
+                Your Access Key ID is <strong>{{ app.amazon_s3_credentials.key }}</strong>
             </div>
         </div>
     </nav>
@@ -29,7 +29,7 @@
                 <ul class="nav nav-pills nav-stacked">
                     {% for bucket in buckets %}
                         <li role="presentation"{% if bucket.Name == selected_bucket %} class="active"{% endif %}>
-                            <a href="{{ path('index', { bucket: bucket.Name }) }}" title="Creation Date: {{ bucket.CreationDate }}">{{ bucket.Name }}</a>
+                            <a href="{{ path('list', { bucket: bucket.Name }) }}" title="Creation Date: {{ bucket.CreationDate }}">{{ bucket.Name }}</a>
                         </li>
                     {% endfor %}
                 </ul>

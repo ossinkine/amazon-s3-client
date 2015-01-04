@@ -28,7 +28,7 @@ class AmazonS3Controller
      * @param  string $bucket
      * @return string
      */
-    public function indexAction($bucket)
+    public function listAction($bucket)
     {
         $errors = array();
 
@@ -62,7 +62,7 @@ class AmazonS3Controller
         }
 
         return $this->twig->render(
-            'index.html.twig',
+            'list.html.twig',
             array('selected_bucket' => $bucket, 'buckets' => $buckets, 'objects' => $objects, 'errors' => $errors)
         );
     }
