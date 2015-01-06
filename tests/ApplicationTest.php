@@ -170,7 +170,7 @@ class ApplicationTest extends WebTestCase
 
     public function createApplication()
     {
-        $app = new Application(['debug' => true]);
+        $app = new Application();
         $app['amazon_s3_client'] = $this->s3ClientMock = $this->getMock(
             'Aws\S3\S3Client',
             array('listBuckets', 'listObjects'),
