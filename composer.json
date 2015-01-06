@@ -1,7 +1,16 @@
 {
-    "autoload": {
-        "psr-0": { "": "src/" }
-    },
+    "name": "ossinkine/amazon-s3-client",
+    "description": "Browser client for Amazon S3 (Simple Storage Service)",
+    "type": "project",
+    "keywords": ["amazon", "aws", "amazon web services", "s3", "simple storage service"],
+    "homepage": "https://github.com/ossinkine/amazon-s3-client",
+    "authors": [
+        {
+            "name": "Gocha Ossinkine",
+            "email": "ossinkine@ya.ru",
+            "homepage": "https://github.com/ossinkine"
+        }
+    ],
     "require": {
         "php": "~5.3",
         "silex/silex": "~1.0",
@@ -14,5 +23,8 @@
         "phpunit/phpunit": "~4.0",
         "symfony/browser-kit": "~2.2",
         "symfony/css-selector": "~2.2"
+    },
+    "autoload": {
+        "psr-4": { "": "src/" }
     }
 }
