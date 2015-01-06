@@ -4,6 +4,7 @@
     "type": "project",
     "keywords": ["amazon", "aws", "amazon web services", "s3", "simple storage service"],
     "homepage": "https://github.com/ossinkine/amazon-s3-client",
+    "license":  "MIT",
     "authors": [
         {
             "name": "Gocha Ossinkine",

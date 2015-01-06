@@ -13,3 +13,7 @@ Install application is very simple using Composer:
     composer create-project ossinkine/amazon-s3-client
     
 How to install Composer you can find on the [Composer website](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx).
+
+License
+-------
+Application is licensed under the MIT license.
