@@ -1,7 +1,7 @@
 {% extends 'layout.html.twig' %}
 
 {% block content %}
-    <form class="form-signin" action="{{ path('authenticate') }}" method="post">
+    <form id="form-signin" action="{{ path('login') }}" method="post">
         {% if error is not empty %}
             <div class="alert alert-danger" role="alert">{{ error }}</div>
         {% endif %}

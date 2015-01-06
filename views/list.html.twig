@@ -8,7 +8,7 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="{{ path('list') }}">Amazon S3 Client</a>
             </div>
-            <form action="{{ path('logout') }}" method="post" class="navbar-right navbar-form">
+            <form action="{{ path('logout') }}" method="post" class="navbar-right navbar-form" id="form-logout">
                 <button type="submit" class="btn btn-default">Logout</button>
             </form>
             <div class="navbar-right navbar-text">
@@ -26,7 +26,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-3">
-                <ul class="nav nav-pills nav-stacked">
+                <ul class="nav nav-pills nav-stacked" id="list-bucket">
                     {% for bucket in buckets %}
                         <li role="presentation"{% if bucket.Name == selected_bucket %} class="active"{% endif %}>
                             <a href="{{ path('list', { bucket: bucket.Name }) }}" title="Creation Date: {{ bucket.CreationDate }}">{{ bucket.Name }}</a>
@@ -37,17 +37,21 @@
             <div class="col-sm-9">
                 {% if selected_bucket is not empty %}
                     {% if objects is not empty %}
-                        <table class="table table-striped">
-                            <tr>
-                                <th>Key</th>
-                                <th>Size</th>
-                            </tr>
-                            {% for object in objects %}
+                        <table class="table table-striped" id="list-object">
+                            <thead>
                                 <tr>
-                                    <td><a href="http://{{ selected_bucket }}.s3.amazonaws.com/{{ object.Key }}" title="ETag: {{ object.ETag|trim('"') }}{{ "\n" }}Last Modified: {{ object.LastModified }}">{{ object.Key }}</a></td>
-                                    <td>{{ object.Size }}</td>
+                                    <th>Key</th>
+                                    <th>Size</th>
                                 </tr>
-                            {% endfor %}
+                            </thead>
+                            <tbody>
+                                {% for object in objects %}
+                                    <tr>
+                                        <td><a href="http://{{ selected_bucket }}.s3.amazonaws.com/{{ object.Key }}" title="ETag: {{ object.ETag|trim('"') }}{{ "\n" }}Last Modified: {{ object.LastModified }}">{{ object.Key }}</a></td>
+                                        <td>{{ object.Size }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
                         </table>
                     {% else %}
                         <div class="alert alert-info" role="alert">The bucket does not contain any keys</div>

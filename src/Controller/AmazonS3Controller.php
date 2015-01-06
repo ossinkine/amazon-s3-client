@@ -51,7 +51,9 @@ class AmazonS3Controller
                     if ($result->get('Contents')) {
                         $objects = array_merge($objects, $result->get('Contents'));
                     }
-                    $marker = $objects[count($objects) - 1]['Key'];
+                    if (count($objects)) {
+                        $marker = $objects[count($objects) - 1]['Key'];
+                    }
                 } while ($result->get('IsTruncated') && ++$iteration < $maxIteration);
                 if ($result->get('IsTruncated')) {
                     $errors[] = sprintf('The number of keys greater than %u, the first part is shown', count($objects));

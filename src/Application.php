@@ -57,7 +57,6 @@ class Application extends Silex\Application
         ;
         $this
             ->post('/login', 'controller.authentication:authenticateAction')
-            ->bind('authenticate')
         ;
         $this
             ->post('/logout', 'controller.authentication:logoutAction')

@@ -11,6 +11,8 @@
         "aws/aws-sdk-php": "2.*"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.*"
+        "phpunit/phpunit": "4.*",
+        "symfony/browser-kit": "~2.3",
+        "symfony/css-selector": "~2.3"
     }
 }
