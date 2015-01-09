@@ -35,9 +35,7 @@ class Application extends Silex\Application
         $this->register(new TwigServiceProvider(), [
             'twig.path'    => __DIR__.'/../views',
             'twig.options' => [
-                'debug'            => $this['debug'],
-                'cache'            => __DIR__.'/../cache/twig',
-                'strict_variables' => true,
+                'cache' => is_writable(__DIR__.'/..') ? __DIR__.'/../cache/twig' : false,
             ],
         ]);
         $this->register(new UrlGeneratorServiceProvider());
