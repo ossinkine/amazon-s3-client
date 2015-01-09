@@ -1,6 +1,6 @@
 <?php
 
-use Guzzle\Service\Resource\Model as DataModel;
+use Aws\Common\Result;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 use Silex\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
@@ -69,8 +69,8 @@ class ApplicationTest extends WebTestCase
     {
         $this->authorize();
         $listUrl = $this->urlGenerator->generate('list', ['bucket' => 'foo']);
-        $this->s3ClientMock->expects($this->once())->method('listBuckets')->willReturn(new DataModel());
-        $this->s3ClientMock->expects($this->once())->method('listObjects')->willReturn(new DataModel());
+        $this->s3ClientMock->expects($this->once())->method('listBuckets')->willReturn(new Result([]));
+        $this->s3ClientMock->expects($this->once())->method('listObjects')->willReturn(new Result([]));
         $crawler = $this->client->request('GET', $listUrl);
         $this->assertTrue($this->client->getResponse()->isOk());
         $form = $crawler->filter('#form-logout')->form();
@@ -94,7 +94,7 @@ class ApplicationTest extends WebTestCase
     {
         $this->authorize();
         $listUrl = $this->urlGenerator->generate('list');
-        $this->s3ClientMock->expects($this->once())->method('listBuckets')->willReturn(new DataModel());
+        $this->s3ClientMock->expects($this->once())->method('listBuckets')->willReturn(new Result([]));
         $this->client->request('GET', $listUrl);
         $this->assertTrue($this->client->getResponse()->isOk());
     }
@@ -103,7 +103,7 @@ class ApplicationTest extends WebTestCase
     {
         $this->authorize();
         $listUrl = $this->urlGenerator->generate('list', ['bucket' => 'foo']);
-        $listBuckets = new DataModel([
+        $listBuckets = new Result([
             'Buckets' => [
                 [
                     'Name'         => 'foo',
@@ -115,7 +115,7 @@ class ApplicationTest extends WebTestCase
                 ],
             ],
         ]);
-        $listObjects = new DataModel([
+        $listObjects = new Result([
             'Contents' => [
                 [
                     'Key'          => 'baz',

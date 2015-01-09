@@ -19,7 +19,15 @@ class Application extends Silex\Application
     public function __construct(array $values = [])
     {
         $values['amazon_s3_client'] = $this->share(function (Application $app) {
-            return S3Client::factory($this->getCredentials());
+            return S3Client::factory(
+                array_merge(
+                    $this->getCredentials(),
+                    [
+                        'version'                   => '2006-03-01',
+                        'ssl.certificate_authority' => false,
+                    ]
+                )
+            );
         });
         $values['amazon_s3_credentials_cookie_name'] = 'credentials';
 

@@ -18,18 +18,9 @@ env:
     - SYMFONY_VERSION=2.4.*
     - SYMFONY_VERSION=2.5.*
     - SYMFONY_VERSION=2.6.*
-    - AWS_VERSION=2.0.*
-    - AWS_VERSION=2.1.*
-    - AWS_VERSION=2.2.*
-    - AWS_VERSION=2.3.*
-    - AWS_VERSION=2.4.*
-    - AWS_VERSION=2.5.*
-    - AWS_VERSION=2.6.*
-    - AWS_VERSION=2.7.*
 
 before_script:
     - if [ $SILEX_VERSION ]; then composer require silex/silex:$SILEX_VERSION; fi
     - if [ $TWIG_VERSION ]; then composer require twig/twig:$TWIG_VERSION; fi
     - if [ $SYMFONY_VERSION ]; then composer require symfony/twig-bridge:$SYMFONY_VERSION symfony/security:$SYMFONY_VERSION symfony/browser-kit:$SYMFONY_VERSION symfony/css-selector:$SYMFONY_VERSION; fi
-    - if [ $AWS_VERSION ]; then composer require aws/aws-sdk-php:$AWS_VERSION; fi
     - composer install
