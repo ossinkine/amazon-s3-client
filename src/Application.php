@@ -19,10 +19,7 @@ class Application extends Silex\Application
     public function __construct(array $values = [])
     {
         $values['amazon_s3_client'] = $this->share(function (Application $app) {
-            return S3Client::factory($app['amazon_s3_credentials']);
-        });
-        $values['amazon_s3_credentials'] = $this->share(function (Application $app) {
-            return json_decode($app['request']->cookies->get($app['amazon_s3_credentials_cookie_name']), true);
+            return S3Client::factory($this->getCredentials());
         });
         $values['amazon_s3_credentials_cookie_name'] = 'credentials';
 
@@ -50,7 +47,8 @@ class Application extends Silex\Application
             ->get('/login', 'controller.authentication:loginAction')
             ->bind('login')
             ->before(function (Request $request, Application $app) {
-                if (!empty($app['amazon_s3_credentials'])) {
+                $credentials = $this->getCredentials();
+                if (!empty($credentials)) {
                     return new RedirectResponse($app['url_generator']->generate('list'));
                 }
             })
@@ -68,7 +66,8 @@ class Application extends Silex\Application
             ->value('bucket', null)
             ->bind('list')
             ->before(function (Request $request, Application $app) {
-                if (empty($app['amazon_s3_credentials'])) {
+                $credentials = $this->getCredentials();
+                if (empty($credentials)) {
                     return $app->handle(
                         Request::create($app['url_generator']->generate('login')),
                         HttpKernelInterface::SUB_REQUEST,
@@ -77,5 +76,16 @@ class Application extends Silex\Application
                 }
             })
         ;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCredentials()
+    {
+        return array_intersect_key(
+            (array) json_decode($this['request']->cookies->get($this['amazon_s3_credentials_cookie_name']), true),
+            ['key' => null, 'secret' => null]
+        );
     }
 }
