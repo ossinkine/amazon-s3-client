@@ -16,7 +16,7 @@ class Application extends Silex\Application
      * @inheritdoc
      * @param array $values
      */
-    public function __construct(array $values = array())
+    public function __construct(array $values = [])
     {
         $values['amazon_s3_client'] = $this->share(function (Application $app) {
             return S3Client::factory($app['amazon_s3_credentials']);
@@ -35,14 +35,14 @@ class Application extends Silex\Application
 
         parent::__construct($values);
 
-        $this->register(new TwigServiceProvider(), array(
+        $this->register(new TwigServiceProvider(), [
             'twig.path'    => __DIR__.'/../views',
-            'twig.options' => array(
+            'twig.options' => [
                 'debug'            => $this['debug'],
                 'cache'            => __DIR__.'/../cache/twig',
                 'strict_variables' => true,
-            ),
-        ));
+            ],
+        ]);
         $this->register(new UrlGeneratorServiceProvider());
         $this->register(new ServiceControllerServiceProvider());
 

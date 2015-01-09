@@ -2,5 +2,5 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-$app = new Application(array('debug' => true));
+$app = new Application(['debug' => true]);
 $app->run();

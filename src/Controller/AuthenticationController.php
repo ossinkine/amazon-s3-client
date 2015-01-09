@@ -34,9 +34,9 @@ class AuthenticationController
      */
     public function loginAction()
     {
-        return $this->twig->render('login.html.twig', array(
+        return $this->twig->render('login.html.twig', [
             'error' => '',
-        ));
+        ]);
     }
 
     /**

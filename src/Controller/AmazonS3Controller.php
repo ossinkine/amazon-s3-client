@@ -30,9 +30,9 @@ class AmazonS3Controller
      */
     public function listAction($bucket)
     {
-        $errors = array();
+        $errors = [];
 
-        $buckets = array();
+        $buckets = [];
         try {
             $result = $this->s3Client->listBuckets();
             $buckets = $result->get('Buckets');
@@ -40,14 +40,14 @@ class AmazonS3Controller
             $errors[] = sprintf('Cannot retrieve buckets: %s', $e->getMessage());
         }
 
-        $objects = array();
+        $objects = [];
         if (!empty($bucket)) {
             try {
                 $maxIteration = 10;
                 $iteration = 0;
                 $marker = '';
                 do {
-                    $result = $this->s3Client->listObjects(array('Bucket' => $bucket, 'Marker' => $marker));
+                    $result = $this->s3Client->listObjects(['Bucket' => $bucket, 'Marker' => $marker]);
                     if ($result->get('Contents')) {
                         $objects = array_merge($objects, $result->get('Contents'));
                     }
@@ -65,7 +65,7 @@ class AmazonS3Controller
 
         return $this->twig->render(
             'list.html.twig',
-            array('selected_bucket' => $bucket, 'buckets' => $buckets, 'objects' => $objects, 'errors' => $errors)
+            ['selected_bucket' => $bucket, 'buckets' => $buckets, 'objects' => $objects, 'errors' => $errors]
         );
     }
 }

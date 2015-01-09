@@ -57,7 +57,7 @@ class ApplicationTest extends WebTestCase
 
     public function testFollowLogin()
     {
-        $listUrl = $this->urlGenerator->generate('list', array('bucket' => 'foo'));
+        $listUrl = $this->urlGenerator->generate('list', ['bucket' => 'foo']);
         $crawler = $this->client->request('GET', $listUrl);
         $this->assertTrue($this->client->getResponse()->isOk());
         $form = $crawler->filter('#form-signin')->form();
@@ -68,7 +68,7 @@ class ApplicationTest extends WebTestCase
     public function testLogout()
     {
         $this->authorize();
-        $listUrl = $this->urlGenerator->generate('list', array('bucket' => 'foo'));
+        $listUrl = $this->urlGenerator->generate('list', ['bucket' => 'foo']);
         $this->s3ClientMock->expects($this->once())->method('listBuckets')->willReturn(new DataModel());
         $this->s3ClientMock->expects($this->once())->method('listObjects')->willReturn(new DataModel());
         $crawler = $this->client->request('GET', $listUrl);
@@ -84,7 +84,7 @@ class ApplicationTest extends WebTestCase
 
     public function testUnauthorizedList()
     {
-        $listUrl = $this->urlGenerator->generate('list', array('bucket' => 'foo'));
+        $listUrl = $this->urlGenerator->generate('list', ['bucket' => 'foo']);
         $crawler = $this->client->request('GET', $listUrl);
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertCount(1, $crawler->filter('#form-signin'));
@@ -102,42 +102,42 @@ class ApplicationTest extends WebTestCase
     public function testListBucket()
     {
         $this->authorize();
-        $listUrl = $this->urlGenerator->generate('list', array('bucket' => 'foo'));
-        $listBuckets = new DataModel(array(
-            'Buckets' => array(
-                array(
+        $listUrl = $this->urlGenerator->generate('list', ['bucket' => 'foo']);
+        $listBuckets = new DataModel([
+            'Buckets' => [
+                [
                     'Name'         => 'foo',
                     'CreationDate' => '2014-08-01T14:00:00.000Z',
-                ),
-                array(
+                ],
+                [
                     'Name'         => 'bar',
                     'CreationDate' => '2014-07-31T20:30:40.000Z',
-                ),
-            ),
-        ));
-        $listObjects = new DataModel(array(
-            'Contents' => array(
-                array(
+                ],
+            ],
+        ]);
+        $listObjects = new DataModel([
+            'Contents' => [
+                [
                     'Key'          => 'baz',
                     'ETag'         => '"'.md5('baz').'"',
                     'LastModified' => '2014-09-10T11:12:13.000Z',
                     'Size'         => 1024,
-                ),
-                array(
+                ],
+                [
                     'Key'          => 'qux',
                     'ETag'         => '"'.md5('qux').'"',
                     'LastModified' => '2014-09-11T21:22:23.000Z',
                     'Size'         => 2048,
-                ),
-                array(
+                ],
+                [
                     'Key'          => 'quxx',
                     'ETag'         => '"'.md5('quxx').'"',
                     'LastModified' => '2014-09-12T00:00:00.000Z',
                     'Size'         => 512,
-                ),
-            ),
+                ],
+            ],
             'IsTruncated' => false,
-        ));
+        ]);
         $this->s3ClientMock->expects($this->once())->method('listBuckets')->willReturn($listBuckets);
         $this->s3ClientMock->expects($this->once())->method('listObjects')->willReturn($listObjects);
         $crawler = $this->client->request('GET', $listUrl);
@@ -148,23 +148,22 @@ class ApplicationTest extends WebTestCase
         $this->assertCount(count($listBuckets['Buckets']), $list);
         $this->assertCount(1, $active);
         $this->assertEquals($list->eq(0), $active);
-        $testCase = $this;
         $urlGenerator = $this->urlGenerator;
-        $list->each(function (Crawler $bucket, $index) use ($testCase, $urlGenerator, $listBuckets) {
+        $list->each(function (Crawler $bucket, $index) use ($urlGenerator, $listBuckets) {
             $link = $bucket->filter('a');
             $expectedName = $listBuckets['Buckets'][$index]['Name'];
-            $testCase->assertEquals($expectedName, $link->text());
-            $testCase->assertEquals($urlGenerator->generate('list', array('bucket' => $expectedName)), $link->attr('href'));
+            $this->assertEquals($expectedName, $link->text());
+            $this->assertEquals($urlGenerator->generate('list', ['bucket' => $expectedName]), $link->attr('href'));
         });
         // objects
         $list = $crawler->filter('#list-object tbody tr');
         $this->assertCount(count($listObjects['Contents']), $list);
-        $list->each(function (Crawler $object, $index) use ($testCase, $listObjects) {
+        $list->each(function (Crawler $object, $index) use ($listObjects) {
             $link = $object->filter('td')->eq(0)->filter('a');
             $expectedKey = $listObjects['Contents'][$index]['Key'];
-            $testCase->assertEquals($expectedKey, $link->text());
-            $testCase->assertEquals('http://foo.s3.amazonaws.com/'.$expectedKey, $link->attr('href'));
-            $testCase->assertEquals($listObjects['Contents'][$index]['Size'], $object->filter('td')->eq(1)->text());
+            $this->assertEquals($expectedKey, $link->text());
+            $this->assertEquals('http://foo.s3.amazonaws.com/'.$expectedKey, $link->attr('href'));
+            $this->assertEquals($listObjects['Contents'][$index]['Size'], $object->filter('td')->eq(1)->text());
         });
     }
 
@@ -173,8 +172,8 @@ class ApplicationTest extends WebTestCase
         $app = new Application();
         $app['amazon_s3_client'] = $this->s3ClientMock = $this->getMock(
             'Aws\S3\S3Client',
-            array('listBuckets', 'listObjects'),
-            array(),
+            ['listBuckets', 'listObjects'],
+            [],
             '',
             false
         );
@@ -188,7 +187,7 @@ class ApplicationTest extends WebTestCase
         $this->client->getCookieJar()->set(
             new Cookie(
                 $cookieName,
-                json_encode(array('key' => 'foo', 'secret' => 'bar'))
+                json_encode(['key' => 'foo', 'secret' => 'bar'])
             )
         );
     }
